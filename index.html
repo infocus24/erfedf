@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chronicle Prime | Premium News Matrix & Aggregator</title>
+    
+    <meta name="description" content="A premium, ultra-responsive dynamic country-wise news and media matrix dashboard.">
+    <meta name="keywords" content="news portal, premium aggregator, global news matrix">
+    <meta name="robots" content="index, follow">
+
+    <style>
+        /* --- CSS VARIABLES & THEMES --- */
+        :root {
+            --bg-base: #f8fafc;
+            --bg-surface: rgba(255, 255, 255, 0.8);
+            --bg-surface-solid: #ffffff;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --glass-blur: 20px;
+            --glass-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.06);
+            --radius-sm: 10px;
+            --radius-md: 20px;
+            --radius-lg: 35px;
+            --radius-square: 0px; 
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-base: #090d16;
+            --bg-surface: rgba(15, 23, 42, 0.8);
+            --bg-surface-solid: #151f32;
+            --border-color: rgba(51, 65, 85, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-primary: #818cf8;
+            --accent-hover: #6366f1;
+            --glass-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 5% 10%, rgba(99, 102, 241, 0.04) 0%, transparent 35%),
+                              radial-gradient(circle at 95% 80%, rgba(236, 72, 153, 0.04) 0%, transparent 35%);
+            background-attachment: fixed;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; outline: none; transition: var(--transition-smooth); }
+        img { max-width: 100%; height: auto; display: block; object-fit: cover; }
+
+        .container {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .glass {
+            background: var(--bg-surface);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-color);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .glass-solid {
+            background: var(--bg-surface-solid);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition-smooth);
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .header-site-links, .footer-site-links {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        
+        .header-site-links a, .footer-site-links a { transition: var(--transition-smooth); }
+        .header-site-links a:hover, .footer-site-links a:hover { color: var(--accent-primary); }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: linear-gradient(to right, var(--accent-primary), #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- AUTH BUTTONS --- */
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .btn-login, .btn-signup {
+            padding: 10px 20px;
+            border-radius: var(--radius-lg);
+            font-weight: 800;
+            font-size: 13px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn-signup {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+        .btn-login:hover, .btn-signup:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+
+        .date-engine {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            line-height: 1.2;
+            border-left: 3px solid var(--accent-primary);
+            padding-left: 12px;
+        }
+
+        .date-day { font-size: 14px; font-weight: 800; color: var(--accent-primary); text-transform: uppercase; }
+        .date-full { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+
+        .header-controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .theme-toggle {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- BREAKING NEWS TICKER --- */
+        .ticker-wrapper {
+            display: flex;
+            align-items: center;
+            background: var(--bg-surface-solid);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: var(--glass-shadow);
+            height: 44px;
+        }
+
+        .ticker-title {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #ffffff;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            z-index: 5;
+        }
+
+        .ticker-text-wrapper {
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .ticker-text-move {
+            display: inline-flex;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: tickerMove 45s linear infinite;
+            will-change: transform;
+        }
+
+        .ticker-item {
+            padding-right: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+        }
+        .ticker-item::before { content: "•"; margin-right: 12px; color: #ef4444; font-size: 18px; }
+
+        @keyframes tickerMove {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        .ticker-text-wrapper:hover .ticker-text-move { animation-play-state: paused; }
+
+        /* Headline Banner */
+        .center-headline-container { text-align: center; margin: 25px 0; }
+        .center-headline {
+            font-size: 36px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.2;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px;
+        }
+
+        /* --- AD CONTAINERS --- */
+        .ad-container {
+            margin: 20px auto; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            width: 100%; 
+            max-width: 100%; 
+            min-height: 90px;
+            border: 1px dashed var(--border-color); 
+            background: rgba(148, 163, 184, 0.02);
+            border-radius: var(--radius-sm); 
+            position: relative; 
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        .section-title {
+            font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+            color: var(--text-primary);
+        }
+        .section-title::after { content: ''; flex-grow: 1; height: 1px; background: var(--border-color); }
+
+        /* --- SEARCH BAR --- */
+        .search-container {
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 300px;
+            margin-left: 0; 
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            fill: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 44px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface-solid);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition-smooth);
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        /* --- GRID DESIGN --- */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Card */
+        .category-card {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--glass-shadow);
+            background: var(--bg-surface-solid);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            contain: paint; 
+        }
+
+        .category-card:hover {
+            z-index: 10;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.3);
+        }
+
+        /* --- PAGINATION STYLES --- */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        .page-num, .page-next {
+            background: var(--bg-surface-solid);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: var(--glass-shadow);
+            font-size: 14px;
+        }
+        .page-num:hover, .page-next:hover {
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+        .page-num.active {
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+        }
+        .page-next {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            border: none;
+        }
+
+        /* --- SLIDESHOW STYLES --- */
+        .slideshow-container {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #0f172a; 
+            display: grid;
+            aspect-ratio: 4 / 5; 
+        }
+
+        .slide-image {
+            grid-area: 1 / 1;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1);
+            will-change: opacity, transform;
+        }
+        
+        .slide-image.active {
+            opacity: 1;
+            transform: scale(1.05);
+            z-index: 1;
+        }
+
+        .category-content { 
+            position: absolute; 
+            bottom: 0; left: 0; right: 0; 
+            padding: 40px 15px 15px 15px; 
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.7) 60%, rgba(15, 23, 42, 0) 100%);
+            z-index: 3; 
+            pointer-events: none;
+        }
+
+        /* Active Dot & Title Styles */
+        .active-status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        
+        .category-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        
+        .active-dot {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.8);
+            animation: pulse-dot 1s infinite;
+        }
+        
+        .active-text {
+            color: #0ea5e9;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        @keyframes pulse-dot {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+        
+        .category-icon { font-size: 16px; }
+        .category-title { font-size: 15px; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        .category-details {
+            font-size: 11px;
+            color: #cbd5e1;
+            font-weight: 500;
+            padding-left: 14px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* --- FOOTER NETWORK HUB --- */
+        .footer-wrapper { padding: 30px 0; border-top: 1px solid var(--border-color); margin-top: 5px; }
+        .footer-container { display: grid; grid-template-columns: 1fr; text-align: center; gap: 24px; }
+        .footer-left { font-size: 13px; color: var(--text-muted); grid-row: 2; }
+        .footer-right-hub { display: flex; flex-direction: column; align-items: center; gap: 10px; grid-row: 1; }
+        
+        .hub-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.8px; }
+        .hub-networks-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 400px; }
+        .network-item {
+            width: 34px; height: 34px; border-radius: 50%; background: var(--bg-surface-solid);
+            border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--glass-shadow); transition: var(--transition-smooth);
+        }
+        .network-item:hover { transform: translateY(-3px); border-color: var(--accent-primary); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.2); }
+        .network-item img { width: 18px; height: 18px; }
+
+        .back-to-top {
+            position: fixed; bottom: 30px; right: 24px; width: 46px; height: 46px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; z-index: 90; color: var(--text-primary);
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+
+        /* --- RESPONSIVE ENGINE --- */
+        @media(max-width: 1400px) { .category-grid { grid-template-columns: repeat(5, 1fr); } }
+        @media(max-width: 1024px) {
+            .center-headline { font-size: 30px; }
+            .category-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media(max-width: 768px) {
+            .center-headline { font-size: 24px; }
+            .header-top { flex-direction: column; gap: 12px; }
+            .header-left { align-items: center; text-align: center; }
+            .header-site-links { justify-content: center; }
+            .header-controls { justify-content: center; width: 100%; }
+            .date-engine { text-align: center; border-left: none; padding-left: 0; }
+            .category-grid { grid-template-columns: repeat(2, 1fr); }
+            .search-container { margin-left: auto; margin-right: auto; max-width: 100%; }
+        }
+        @media(max-width: 480px) { .category-grid { grid-template-columns: repeat(1, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <header class="glass">
+        <div class="container">
+            <div class="header-top">
+                <div class="header-left">
+                    <a href="/" class="logo">
+                        <svg style="width:26px; height:26px; fill:var(--accent-primary);" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        Chronicle Prime
+                    </a>
+                    <nav class="header-site-links" id="headerLinksPipeline"></nav>
+                </div>
+                
+                <div class="header-controls">
+                    <div class="auth-buttons">
+                        <a href="#" id="customLoginBtn" class="btn-login" target="_blank">Login</a>
+                        <a href="#" id="customSignupBtn" class="btn-signup" target="_blank">Create Free Account</a>
+                    </div>
+
+                    <div class="date-engine">
+                        <span id="weekdayDisplay" class="date-day">-</span>
+                        <span id="gregorianDisplay" class="date-full">-</span>
+                    </div>
+
+                    <button class="theme-toggle glass-solid" id="themeToggleBtn" aria-label="Toggle Theme">
+                        <svg class="sun-icon" style="width:20px; height:20px; stroke:var(--text-primary); stroke-width:2; fill:none; display:none;" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" style="width:20px; height:20px; stroke:var(--text-primary); stroke-width:2; fill:none;" viewBox="0 0 24 24">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+    </header>
+
+    <!-- NEWS TICKER -->
+    <div class="container">
+        <div class="ticker-wrapper">
+            <div class="ticker-title">LIVE UPDATES</div>
+            <div class="ticker-text-wrapper">
+                <div class="ticker-text-move" id="breakingTickerPipeline"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ============================================================== -->
+    <!-- BANNER / NATIVE AD SLOT 1 (Top / Headliner) -->
+    <!-- ============================================================== -->
+    <div class="container">
+        <div class="ad-container" id="ad-slot-1">
+            <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+            <script>
+            atOptions = {
+                'key' : '333161345cd3bddcae6fb4659b28d162',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+            };
+            </script>
+            <script src="https://www.highperformanceformat.com/333161345cd3bddcae6fb4659b28d162/invoke.js"></script>
+        </div>
+    </div>
+
+
+    <div class="center-headline-container">
+        <h1 class="center-headline">aaaaaaaaaaaaaaaaaaaa</h1>
+        <p style="color: var(--text-secondary); font-weight: 500; font-size: 14px;">Explore our categories below.</p>
+    </div>
+
+
+    <main class="container">
+        <div id="homeLandingPage">
+            <h2 class="section-title">Available Live Free Chat</h2>
+            
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search Name...">
+            </div>
+
+            <!-- গ্রিড পার্ট ১ (১ম ৩ লাইন / ০-১৮ কার্ড) -->
+            <div class="category-grid" id="grid-part-1"></div>
+            
+            <!-- ============================================================== -->
+            <!-- BANNER / NATIVE AD SLOT 2 (৩ লাইন পর পর) -->
+            <!-- ============================================================== -->
+            <div class="ad-container" id="ad-slot-2">
+                <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+                <script>
+                atOptions = {
+                    'key' : '333161345cd3bddcae6fb4659b28d162',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+                </script>
+                <script src="https://www.highperformanceformat.com/333161345cd3bddcae6fb4659b28d162/invoke.js"></script>
+            </div>
+
+            <!-- গ্রিড পার্ট ২ (২য় ৩ লাইন / ১৯-৩৬ কার্ড) -->
+            <div class="category-grid" id="grid-part-2"></div>
+            
+            <!-- ============================================================== -->
+            <!-- BANNER / NATIVE AD SLOT 3 (৩ লাইন পর পর) -->
+            <!-- ============================================================== -->
+            <div class="ad-container" id="ad-slot-3">
+                <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+                <script>
+                atOptions = {
+                    'key' : '333161345cd3bddcae6fb4659b28d162',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+                </script>
+                <script src="https://www.highperformanceformat.com/333161345cd3bddcae6fb4659b28d162/invoke.js"></script>
+            </div>
+
+            <!-- গ্রিড পার্ট ৩ (৩য় ৩ লাইন / ৩৭-৫৪ কার্ড) -->
+            <div class="category-grid" id="grid-part-3"></div>
+
+            <!-- ============================================================== -->
+            <!-- BANNER / NATIVE AD SLOT 4 (৩ লাইন পর পর) -->
+            <!-- ============================================================== -->
+            <div class="ad-container" id="ad-slot-4">
+                <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+                <script async="async" data-cfasync="false" src="https://pl28837871.effectivecpmnetwork.com/a42710cbc275532005aa72c80ea3aa31/invoke.js"></script>
+                <div id="container-a42710cbc275532005aa72c80ea3aa31"></div>
+            </div>
+
+            <!-- গ্রিড পার্ট ৪ (৪র্থ ৩ লাইন / ৫৫-৭২ কার্ড) -->
+            <div class="category-grid" id="grid-part-4"></div>
+            
+            <!-- ============================================================== -->
+            <!-- BANNER / NATIVE AD SLOT 5 (৩ লাইন পর পর) -->
+            <!-- ============================================================== -->
+            <div class="ad-container" id="ad-slot-5">
+                <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+                <script>
+                atOptions = {
+                    'key' : '333161345cd3bddcae6fb4659b28d162',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+                </script>
+                <script src="https://www.highperformanceformat.com/333161345cd3bddcae6fb4659b28d162/invoke.js"></script>
+            </div>
+
+            <!-- গ্রিড পার্ট ৫ (৫ম ৩ লাইন / ৭৩-৯০ কার্ড) -->
+            <div class="category-grid" id="grid-part-5"></div>
+            
+            <!-- ============================================================== -->
+            <!-- BANNER / NATIVE AD SLOT 6 (৩ লাইন পর পর) -->
+            <!-- ============================================================== -->
+            <div class="ad-container" id="ad-slot-6">
+                <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+                <script>
+                atOptions = {
+                    'key' : '333161345cd3bddcae6fb4659b28d162',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+                </script>
+                <script src="https://www.highperformanceformat.com/333161345cd3bddcae6fb4659b28d162/invoke.js"></script>
+            </div>
+
+            <!-- গ্রিড পার্ট ৬ (শেষ অংশ / ৯১-১০০ কার্ড) -->
+            <div class="category-grid" id="grid-part-6"></div>
+
+            <!-- ============================================================== -->
+            <!-- BANNER / NATIVE AD SLOT 7 (প্রোফাইল কার্ড গুলোর একদম শেষে) -->
+            <!-- ============================================================== -->
+            <div class="ad-container" id="ad-slot-7">
+                <!-- এখানে আপনার ম্যানুয়াল ব্যানার বা নেটিভ অ্যাড কোড বসান (Native/Banner Ad Code) -->
+                <script>
+                atOptions = {
+                    'key' : '333161345cd3bddcae6fb4659b28d162',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+                </script>
+                <script src="https://www.highperformanceformat.com/333161345cd3bddcae6fb4659b28d162/invoke.js"></script>
+            </div>
+            
+            <div id="paginationPipeline" class="pagination-container"></div>
+        </div>
+    </main>
+
+
+    <footer class="footer-wrapper">
+        <div class="container footer-container">
+            <div class="footer-left">
+                <p>Copyright &copy; <span id="autoYear"></span> | Chronicle Prime Portal ❤️All Rights Reserved.</p>
+            </div>
+            <div class="footer-right-hub">
+                <span class="hub-title">Quick Connected Networks</span>
+                <div class="hub-networks-grid" id="footerSocialNetworksPipeline"></div>
+                <nav class="footer-site-links" id="footerLinksPipeline"></nav>
+            </div>
+        </div>
+    </footer>
+
+    <button class="back-to-top glass-solid" id="backToTopFab" aria-label="Scroll to top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <svg style="width:18px; height:18px; fill:currentColor;" viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+    </button>
+
+    <script>
+        //<![CDATA[
+        
+        const USER_CONFIG = {
+            personalLinks: {
+                loginLink: "https://your-personal-link.com/login",
+                signupLink: "https://your-personal-link.com/signup"
+            },
+            ads: {
+                // পপ-আন্ডার সেটিংস (১০০% নির্ভরযোগ্যতা)
+                enablePopunder: true,
+                popunderUrl: "https://your-popunder-link.com" // আপনার পপ-আন্ডারের কাঙ্ক্ষিত ডাইরেক্ট লিংকটি এখানে বসান
+            }
+        };
+
+        const DATABASE = {
+            settings: { activeText: "Active Now" },
+            speedSettings: {
+                tickerDuration: "50s",
+                slideshowBaseSpeed: 7000, 
+                slideshowRandomDelay: 1000
+            },
+            sitePages: [
+                { name: "Privacy Policy", url: "https://sites.google.com/view/free-dating69-site/home" }, { name: "FAQ", url: "#" },
+                { name: "Disclaimer", url: "https://sites.google.com/view/disclaimer69/home" }, { name: "Terms & Conditions", url: "#" },
+                { name: "About Us", url: "#" }, { name: "Contact Us", url: "#" }
+            ],
+            categories: [
+                { id: "International", name: "International", url: "#", details: "Global events, world news, and cross-border stories.", icon: "", images: ["https://i.postimg.cc/kX3czD9P/c078b5497b57008efb2fd64307a25b38-f.jpg", "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=600&auto=format&fit=crop"] },
+                { id: "Politics", name: "Politics", url: "#", details: "Government policies, elections, and political debates.", icon: "", images: ["https://i.postimg.cc/28NRz4hc/82b87c38f003c4c0517a443e38455708.jpg", "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=600&auto=format&fit=crop"] },
+                { id: "Economy", name: "Economy", url: "#", details: "Stock markets, inflation, and global financial shifts.", icon: "", images: ["https://i.postimg.cc/PfghCGsz/9d09dfc50646bac3897bde49268844eb.jpg", "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop"] },
+                { id: "Tina Henry", name: "Tina Henry", url: "#", details: "Latest local and national updates.", icon: "", images: ["https://i.postimg.cc/NMj88r1r/ce1461c2bfdcbb26865a8ac46edee9c2-f.jpg", "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&auto=format&fit=crop"] },
+                { id: "Technology", name: "Technology", url: "#", details: "AI advancements, gadgets, and tech industry news.", icon: "", images: ["https://i.postimg.cc/v8JM4RFN/146e81f26881b3bd4df54cdce254c453.jpg", "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop"] },
+                { id: "Business", name: "Business", url: "#", details: "Corporate updates, startups, and market trends.", icon: "", images: ["https://i.postimg.cc/NMj88r1r/ce1461c2bfdcbb26865a8ac46edee9c2-f.jpg", "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop"] },
+                { id: "Sports", name: "Sports", url: "#", details: "Live scores, match highlights, and sports news.", icon: "", images: ["https://i.postimg.cc/NMj88r1r/ce1461c2bfdcbb26865a8ac46edee9c2-f.jpg", "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&auto=format&fit=crop"] },
+                { id: "Entertainment", name: "Entertainment", url: "#", details: "Movies, music, celebrity gossip, and pop culture.", icon: "", images: ["https://i.postimg.cc/vHbn5nbx/f168d7246db323557c9c5bee81facb5b-f.jpg", "https://images.unsplash.com/photo-1470229722913-7c092bce42f1?w=600&auto=format&fit=crop"] },
+                { id: "Lifestyle", name: "Lifestyle", url: "#", details: "Health, fitness, fashion, and daily living tips.", icon: "", images: ["https://images.unsplash.com/photo-1598468872842-d39d85892daf?w=600&auto=format&fit=crop", "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop"] },
+                { id: "Education", name: "Education", url: "#", details: "Academic news, scholarships, and learning resources.", icon: "", images: ["https://i.postimg.cc/NMj88r1r/ce1461c2bfdcbb26865a8ac46edee9c2-f.jpg", "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop"] },
+                { id: "Jobs", name: "Jobs", url: "#", details: "Career advice, job postings, and hiring trends.", icon: "", images: ["https://i.postimg.cc/NMj88r1r/ce1461c2bfdcbb26865a8ac46edee9c2-f.jpg", "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&auto=format&fit=crop"] },
+                { id: "Opinion", name: "Opinion", url: "#", details: "Expert columns, editorials, and diverse viewpoints.", icon: "", images: ["https://images.unsplash.com/photo-1598363431659-330370aaaa7b?w=600&auto=format&fit=crop", "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600&auto=format&fit=crop"] },
+                { id: "Videos", name: "Videos", url: "#", details: "Trending video clips, documentaries, and streams.", icon: "", images: ["https://images.unsplash.com/photo-1490971688337-f2c79913ea7d?w=600&auto=format&fit=crop", "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop"] }
+            ],
+            tickerItems: ["Matrix System Dynamic Core Online.", "Live active status updated successfully.", "Chronicle Prime premium node setup."],
+            socialLinks: [
+                { name: "Facebook", icon: "https://img.icons8.com/color/48/facebook-new.png", url: "#" },
+                { name: "YouTube", icon: "https://img.icons8.com/color/48/youtube-play.png", url: "#" },
+                { name: "TikTok", icon: "https://img.icons8.com/color/48/tiktok.png", url: "#" },
+                { name: "Telegram", icon: "https://img.icons8.com/color/48/telegram-app.png", url: "#" },
+                { name: "WhatsApp", icon: "https://img.icons8.com/color/48/whatsapp.png", url: "#" }
+            ]
+        };
+
+        let currentPage = 1;
+        const itemsPerPage = 100;
+        const totalItemsRequired = 1000; 
+        let maxVisiblePage = 3; 
+
+        function expandDatabase() {
+            const original = [...DATABASE.categories];
+            DATABASE.categories = [];
+            for (let i = 0; i < totalItemsRequired; i++) {
+                DATABASE.categories.push(original[i % original.length]);
+            }
+        }
+
+        function initializeCalendarEngine() {
+            const now = new Date();
+            document.getElementById("weekdayDisplay").textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+            document.getElementById("gregorianDisplay").textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function initializeTicker() {
+            const pipeline = document.getElementById("breakingTickerPipeline");
+            pipeline.innerHTML = DATABASE.tickerItems.map(item => `<span class="ticker-item">${item}</span>`).join('');
+            pipeline.style.animationDuration = DATABASE.speedSettings.tickerDuration;
+        }
+
+        function renderSiteLinks() {
+            const linksStr = DATABASE.sitePages.map(page => `<a href="${page.url}">${page.name}</a>`).join('');
+            document.getElementById("headerLinksPipeline").innerHTML = linksStr;
+            document.getElementById("footerLinksPipeline").innerHTML = linksStr;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function renderCategories() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const currentItems = DATABASE.categories.slice(start, end);
+
+            const generateHTML = (items, startIndex) => {
+                return items.map((cat, index) => `
+                    <a href="${cat.url || '#'}" target="_blank" class="category-card" data-name="${cat.name.toLowerCase()}">
+                        <div class="slideshow-container" id="slide-${startIndex + index}">
+                            ${cat.images.map((img, i) => `<img class="slide-image ${i === 0 ? 'active' : ''}" src="${img}" alt="${cat.name}" loading="lazy" decoding="async">`).join('')}
+                        </div>
+                        <div class="category-content">
+                            <div class="active-status-wrapper">
+                                <span class="active-dot"></span>
+                                <span class="active-text">${DATABASE.settings.activeText}</span>
+                            </div>
+                            <div class="category-title-wrapper">
+                                <span class="category-icon">${cat.icon}</span>
+                                <h3 class="category-title">${cat.name}</h3>
+                            </div>
+                            <p class="category-details">${cat.details}</p>
+                        </div>
+                    </a>
+                `).join('');
+            };
+
+            // গ্রিডটিকে ৬টি ভাগে বিভক্ত করে রেন্ডার করা হয়েছে যেন প্রতি ৩ লাইন (১৮ কার্ড) পর পর একটি অ্যাড বসে।
+            document.getElementById("grid-part-1").innerHTML = generateHTML(currentItems.slice(0, 18), 0);
+            document.getElementById("grid-part-2").innerHTML = generateHTML(currentItems.slice(18, 36), 18);
+            document.getElementById("grid-part-3").innerHTML = generateHTML(currentItems.slice(36, 54), 36);
+            document.getElementById("grid-part-4").innerHTML = generateHTML(currentItems.slice(54, 72), 54);
+            document.getElementById("grid-part-5").innerHTML = generateHTML(currentItems.slice(72, 90), 72);
+            document.getElementById("grid-part-6").innerHTML = generateHTML(currentItems.slice(90, 100), 90);
+            
+            initializeSlideshows();
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            const totalPages = Math.ceil(DATABASE.categories.length / itemsPerPage);
+            const pipeline = document.getElementById("paginationPipeline");
+            let html = "";
+            
+            if (currentPage + 1 > maxVisiblePage && currentPage < totalPages) {
+                maxVisiblePage = currentPage + 1;
+            } else if (currentPage === totalPages) {
+                maxVisiblePage = totalPages;
+            }
+            
+            for(let i = 1; i <= maxVisiblePage; i++) {
+                html += `<button class="page-num ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            if (currentPage < totalPages) {
+                html += `<button class="page-next" onclick="goToPage(${currentPage + 1})">Next &raquo;</button>`;
+            }
+            
+            pipeline.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderCategories();
+            document.getElementById("homeLandingPage").scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.category-card');
+                cards.forEach(card => {
+                    const profileName = card.getAttribute('data-name');
+                    card.style.display = profileName.includes(searchTerm) ? "flex" : "none"; 
+                });
+            });
+        }
+
+        function initializeSlideshows() {
+            const containers = document.querySelectorAll('.slideshow-container');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (!entry.target.dataset.intervalId) {
+                            const intervalId = setInterval(() => {
+                                let images = entry.target.querySelectorAll('.slide-image');
+                                if(images.length === 0) return;
+                                let currentIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+                                if(currentIndex !== -1) images[currentIndex].classList.remove('active');
+                                let nextIndex = (currentIndex + 1) % images.length;
+                                if(images[nextIndex]) images[nextIndex].classList.add('active');
+                            }, DATABASE.speedSettings.slideshowBaseSpeed + Math.random() * DATABASE.speedSettings.slideshowRandomDelay);
+                            entry.target.dataset.intervalId = intervalId;
+                        }
+                    } else {
+                        if (entry.target.dataset.intervalId) {
+                            clearInterval(entry.target.dataset.intervalId);
+                            entry.target.dataset.intervalId = "";
+                        }
+                    }
+                });
+            }, { rootMargin: '100px' }); 
+
+            containers.forEach(container => observer.observe(container));
+        }
+
+        function initializeThemeSystem() {
+            const toggleBtn = document.getElementById("themeToggleBtn");
+            const sun = toggleBtn.querySelector(".sun-icon");
+            const moon = toggleBtn.querySelector(".moon-icon");
+            let activeTheme = localStorage.getItem("CHRONICLE_THEME") || "light";
+
+            function applyTheme(target) {
+                document.documentElement.setAttribute("data-theme", target);
+                localStorage.setItem("CHRONICLE_THEME", target);
+                if (target === "dark") { sun.style.display = "block"; moon.style.display = "none"; }
+                else { sun.style.display = "none"; moon.style.display = "block"; }
+            }
+            applyTheme(activeTheme);
+            toggleBtn.addEventListener("click", () => {
+                const current = document.documentElement.getAttribute("data-theme");
+                applyTheme(current === "dark" ? "light" : "dark");
+            });
+        }
+
+        function renderFooterSocialHub() {
+            const pipeline = document.getElementById("footerSocialNetworksPipeline");
+            pipeline.innerHTML = DATABASE.socialLinks.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="network-item" title="${link.name}">
+                    <img src="${link.icon}" alt="${link.name}" loading="lazy" onerror="this.src='https://img.icons8.com/color/48/globe.png'">
+                </a>
+            `).join('');
+        }
+
+        // 100% Reliable Popunder Click Engine
+        function initializePopunderSystem() {
+            if (!USER_CONFIG.ads.enablePopunder || !USER_CONFIG.ads.popunderUrl) return;
+            let popunderExecuted = false;
+
+            const executePopunder = (e) => {
+                // পপআন্ডার শুধুমাত্র একবার খোলার জন্য ফ্ল্যাগ সেট করা হলো
+                if (!popunderExecuted) {
+                    popunderExecuted = true;
+                    // ডাইরেক্ট লিংকে ক্লিক হলে ব্রাউজারের রেস্ট্রিকশন ছাড়াই নতুন উইন্ডোতে খুলবে
+                    window.open(USER_CONFIG.ads.popunderUrl, '_blank');
+                    // ইভেন্ট লিসেনার রিমুভ করা হলো
+                    document.removeEventListener('click', executePopunder, true);
+                }
+            };
+            // 'true' প্যারামিটার ব্যবহার করায় ব্রাউজারের অন্য কোনো ইভেন্ট ফায়ার হওয়ার আগেই এটি কাজ করবে
+            document.addEventListener('click', executePopunder, true);
+        }
+
+        function applyUserSettings() {
+            document.getElementById('customLoginBtn').href = USER_CONFIG.personalLinks.loginLink;
+            document.getElementById('customSignupBtn').href = USER_CONFIG.personalLinks.signupLink;
+            
+            initializePopunderSystem();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            applyUserSettings();
+            initializeThemeSystem();
+            initializeCalendarEngine();
+            initializeTicker();
+            renderSiteLinks();
+            document.getElementById("autoYear").textContent = new Date().getFullYear();
+            
+            shuffleArray(DATABASE.categories); 
+            expandDatabase(); 
+            renderCategories(); 
+            
+            initializeSearch(); 
+            renderFooterSocialHub();
+            
+            const fab = document.getElementById("backToTopFab");
+            let isScrolling = false;
+            window.addEventListener("scroll", () => {
+                if (!isScrolling) {
+                    window.requestAnimationFrame(() => {
+                        if(window.scrollY > 300) fab.classList.add("visible");
+                        else fab.classList.remove("visible");
+                        isScrolling = false;
+                    });
+                    isScrolling = true;
+                }
+            }, { passive: true });
+        });
+        //]]>
+    </script>
+</body>
+</html>
